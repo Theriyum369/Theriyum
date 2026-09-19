@@ -53,3 +53,8 @@ Each song entry should eventually include:
 - Connected to: Bass music
 
 ### Theriyum Notes
+
+- Purity connects BACKWHEN to the modern Phonk, Trap, Wave, and Bass Music network.
+- The song combines atmospheric production, heavy bass, electronic textures, and trap-influenced rhythm.
+- Purity provides a song-level connection between BACKWHEN, Purple Posse, and the modern phonk scene.
+- Theriyum can use this song as a connection point between sound, genre, artist, era, and scene.
