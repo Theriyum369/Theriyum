@@ -36,3 +36,8 @@ This file records meaningful relationships between artists, music, sounds, scene
 - Connected to: bass music
 
 ### Theriyum Relationship Notes
+
+- BACKWHEN connects multiple parts of the Theriyum system through artist relationships, genres, sounds, eras, and scenes.
+- Purple Posse provides a community connection between BACKWHEN and the modern phonk network.
+- BACKWHEN connects Trap, Phonk, Wave, and Bass Music through shared musical characteristics.
+- The relationship network shows how one artist can connect multiple areas of the Theriyum library.
