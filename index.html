@@ -3,135 +3,418 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Theriyum</title>
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0b0b0b;
+      color: white;
     }
 
     header {
       padding: 24px;
-      border-bottom: 1px solid #333;
+      border-bottom: 1px solid #2a2a2a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 32px;
+    .logo {
+      font-size: 30px;
+      font-weight: bold;
+      letter-spacing: 2px;
     }
 
-    .tagline {
-      color: #aaa;
-      margin-top: 8px;
+    .version {
+      color: #777;
+      font-size: 13px;
     }
 
     main {
-      padding: 24px;
-      max-width: 1000px;
+      max-width: 900px;
       margin: auto;
+      padding: 50px 20px;
     }
 
-    .search {
-      width: 100%;
-      padding: 14px;
-      box-sizing: border-box;
-      background: #1c1c1c;
-      border: 1px solid #444;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 16px;
-      margin-bottom: 24px;
+    .hero {
+      text-align: center;
+      margin-bottom: 45px;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
     }
 
-    .card {
-      padding: 20px;
-      background: #1c1c1c;
-      border: 1px solid #333;
-      border-radius: 10px;
-    }
-
-    .card h2 {
-      margin-top: 0;
-      font-size: 20px;
-    }
-
-    .card p {
+    .hero p {
       color: #aaa;
-      line-height: 1.5;
+      font-size: 18px;
+    }
+
+    .search-box {
+      display: flex;
+      max-width: 650px;
+      margin: 30px auto;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 16px;
+      border: 1px solid #333;
+      border-radius: 10px 0 0 10px;
+      background: #151515;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .search-box button {
+      padding: 16px 22px;
+      border: none;
+      border-radius: 0 10px 10px 0;
+      background: white;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .search-box button:hover {
+      background: #ddd;
+    }
+
+    .section-title {
+      margin-top: 45px;
+      margin-bottom: 18px;
+      color: #aaa;
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 2px;
+    }
+
+    .song-card {
+      background: #151515;
+      border: 1px solid #292929;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .song-card h2 {
+      margin: 0 0 6px;
+      font-size: 25px;
+    }
+
+    .artist {
+      color: #aaa;
+      margin-bottom: 18px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tag {
+      background: #242424;
+      border-radius: 20px;
+      padding: 7px 12px;
+      color: #ccc;
+      font-size: 13px;
+    }
+
+    .connections {
+      padding-top: 15px;
+      border-top: 1px solid #292929;
+      color: #aaa;
+      line-height: 1.7;
+    }
+
+    .connections strong {
+      color: white;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .actions a {
+      text-decoration: none;
+      padding: 11px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .listen {
+      background: white;
+      color: black;
+    }
+
+    .buy {
+      border: 1px solid #555;
+      color: white;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #noResults {
+      color: #888;
+      text-align: center;
+      padding: 30px;
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      color: #555;
+      padding: 50px 20px;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions a {
+        text-align: center;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <header>
-    <h1>Theriyum</h1>
-    <div class="tagline">
-      A structured way to explore music and the relationships between it.
+<header>
+  <div class="logo">THERIYUM</div>
+  <div class="version">Prototype v0.1</div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <h1>Find the sound.</h1>
+
+    <p>
+      Discover music through artists, songs, sounds,
+      scenes, eras and the connections between them.
+    </p>
+
+    <div class="search-box">
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Search a song, artist, genre, sound..."
+      >
+
+      <button onclick="searchMusic()">
+        Search
+      </button>
     </div>
-  </header>
+  </section>
 
-  <main>
 
-    <input
-      class="search"
-      type="text"
-      placeholder="Search the Theriyum library..."
+  <div class="section-title">
+    Music
+  </div>
+
+
+  <div id="results">
+
+    <article
+      class="song-card"
+      data-search="backwhen underground hip hop phonk atmospheric dark"
     >
 
-    <div class="grid">
+      <h2>Example Track</h2>
 
-      <div class="card">
-        <h2>Artists</h2>
-        <p>Explore artists and their musical relationships.</p>
+      <div class="artist">
+        Backwhen
       </div>
 
-      <div class="card">
-        <h2>Songs</h2>
-        <p>Explore individual songs and their characteristics.</p>
+      <div class="tags">
+        <span class="tag">Underground</span>
+        <span class="tag">Hip-Hop</span>
+        <span class="tag">Atmospheric</span>
+        <span class="tag">Dark</span>
       </div>
 
-      <div class="card">
-        <h2>Albums</h2>
-        <p>Explore releases and their connections.</p>
+      <div class="connections">
+        <strong>Theriyum Connections</strong><br>
+        Artist → Backwhen<br>
+        Sound → Atmospheric / Dark<br>
+        Scene → Underground<br>
+        Related music → coming next
       </div>
 
-      <div class="card">
-        <h2>Genres</h2>
-        <p>Explore genres, styles, and related sounds.</p>
+      <div class="actions">
+
+        <a
+          class="listen"
+          href="https://soundcloud.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ▶ Listen
+        </a>
+
+        <a
+          class="buy"
+          href="#"
+          onclick="comingSoon(event)"
+        >
+          Buy Track
+        </a>
+
       </div>
 
-      <div class="card">
-        <h2>Sounds</h2>
-        <p>Explore musical characteristics and textures.</p>
+    </article>
+
+
+    <article
+      class="song-card"
+      data-search="electronic ambient experimental atmospheric electronic music"
+    >
+
+      <h2>Example Discovery</h2>
+
+      <div class="artist">
+        New Artist
       </div>
 
-      <div class="card">
-        <h2>Eras</h2>
-        <p>Explore music through different periods of time.</p>
+      <div class="tags">
+        <span class="tag">Electronic</span>
+        <span class="tag">Ambient</span>
+        <span class="tag">Experimental</span>
       </div>
 
-      <div class="card">
-        <h2>Scenes</h2>
-        <p>Explore communities, movements, and cultural networks.</p>
+      <div class="connections">
+        <strong>Theriyum Connections</strong><br>
+        Genre → Electronic<br>
+        Sound → Ambient<br>
+        Scene → Independent<br>
+        Era → Current
       </div>
 
-      <div class="card">
-        <h2>Relationships</h2>
-        <p>Explore the connections between everything in the library.</p>
+      <div class="actions">
+
+        <a
+          class="listen"
+          href="https://soundcloud.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ▶ Listen
+        </a>
+
+        <a
+          class="buy"
+          href="#"
+          onclick="comingSoon(event)"
+        >
+          Buy Track
+        </a>
+
       </div>
 
-    </div>
+    </article>
 
-  </main>
+  </div>
+
+
+  <div id="noResults">
+    No matches yet. Try another search.
+  </div>
+
+</main>
+
+
+<footer>
+  Theriyum — Follow the connections.
+</footer>
+
+
+<script>
+
+  function searchMusic() {
+
+    const input =
+      document
+        .getElementById("searchInput")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const cards =
+      document.querySelectorAll(".song-card");
+
+    let matches = 0;
+
+    cards.forEach(function(card) {
+
+      const searchableText =
+        (card.innerText + " " + card.dataset.search)
+          .toLowerCase();
+
+      if (
+        input === "" ||
+        searchableText.includes(input)
+      ) {
+
+        card.classList.remove("hidden");
+        matches++;
+
+      } else {
+
+        card.classList.add("hidden");
+
+      }
+
+    });
+
+    document.getElementById("noResults").style.display =
+      matches === 0 ? "block" : "none";
+  }
+
+
+  document
+    .getElementById("searchInput")
+    .addEventListener("keydown", function(event) {
+
+      if (event.key === "Enter") {
+        searchMusic();
+      }
+
+    });
+
+
+  function comingSoon(event) {
+
+    event.preventDefault();
+
+    alert(
+      "Purchasing is coming to Theriyum. This button will eventually connect listeners directly to a legitimate place to buy the track."
+    );
+
+  }
+
+</script>
 
 </body>
 </html>
