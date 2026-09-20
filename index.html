@@ -424,6 +424,40 @@
     SUPABASE_URL,
     SUPABASE_KEY
   );
+
+    async function testDatabaseConnection() {
+  const { data, error } = await theriyumDB
+    .from("songs")
+    .select(`
+      id,
+      title,
+      artists (
+        name
+      )
+    `)
+    .eq("title", "Theriyum Test Track");
+
+  if (error) {
+    console.error("Theriyum database error:", error);
+    alert("Database connection error. Check console.");
+    return;
+  }
+
+  console.log("THERIYUM DATABASE CONNECTED:", data);
+
+  if (data && data.length > 0) {
+    alert(
+      "THERIYUM CONNECTED!\n\n" +
+      data[0].title +
+      " — " +
+      data[0].artists.name
+    );
+  } else {
+    alert("Connected to Supabase, but test song was not found.");
+  }
+}
+
+testDatabaseConnection();
 </script>
 
 </body>
