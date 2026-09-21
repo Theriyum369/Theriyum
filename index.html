@@ -170,11 +170,23 @@
       display: none;
     }
 
+    #loadingMessage,
+    #errorMessage,
     #noResults {
       color: #888;
       text-align: center;
       padding: 30px;
+    }
+
+    #errorMessage,
+    #noResults {
       display: none;
+    }
+
+    .library-count {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 18px;
     }
 
     footer {
@@ -229,114 +241,21 @@
     </div>
   </section>
 
-
   <div class="section-title">
     Music
   </div>
 
+  <div id="libraryCount" class="library-count"></div>
 
-  <div id="results">
-
-    <article
-      class="song-card"
-      data-search="backwhen underground hip hop phonk atmospheric dark"
-    >
-
-      <h2>Example Track</h2>
-
-      <div class="artist">
-        Backwhen
-      </div>
-
-      <div class="tags">
-        <span class="tag">Underground</span>
-        <span class="tag">Hip-Hop</span>
-        <span class="tag">Atmospheric</span>
-        <span class="tag">Dark</span>
-      </div>
-
-      <div class="connections">
-        <strong>Theriyum Connections</strong><br>
-        Artist → Backwhen<br>
-        Sound → Atmospheric / Dark<br>
-        Scene → Underground<br>
-        Related music → coming next
-      </div>
-
-      <div class="actions">
-
-        <a
-          class="listen"
-          href="https://soundcloud.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          ▶ Listen
-        </a>
-
-        <a
-          class="buy"
-          href="#"
-          onclick="comingSoon(event)"
-        >
-          Buy Track
-        </a>
-
-      </div>
-
-    </article>
-
-
-    <article
-      class="song-card"
-      data-search="electronic ambient experimental atmospheric electronic music"
-    >
-
-      <h2>Example Discovery</h2>
-
-      <div class="artist">
-        New Artist
-      </div>
-
-      <div class="tags">
-        <span class="tag">Electronic</span>
-        <span class="tag">Ambient</span>
-        <span class="tag">Experimental</span>
-      </div>
-
-      <div class="connections">
-        <strong>Theriyum Connections</strong><br>
-        Genre → Electronic<br>
-        Sound → Ambient<br>
-        Scene → Independent<br>
-        Era → Current
-      </div>
-
-      <div class="actions">
-
-        <a
-          class="listen"
-          href="https://soundcloud.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          ▶ Listen
-        </a>
-
-        <a
-          class="buy"
-          href="#"
-          onclick="comingSoon(event)"
-        >
-          Buy Track
-        </a>
-
-      </div>
-
-    </article>
-
+  <div id="loadingMessage">
+    Loading music from Theriyum...
   </div>
 
+  <div id="errorMessage">
+    Theriyum could not load the music library.
+  </div>
+
+  <div id="results"></div>
 
   <div id="noResults">
     No matches yet. Try another search.
@@ -344,13 +263,187 @@
 
 </main>
 
-
 <footer>
   Theriyum — Follow the connections.
 </footer>
 
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
 <script>
+  const SUPABASE_URL =
+    "https://jmgimkrmdqrziiumcepg.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_DugDCtB0nTGyjPxJfy2g8Q_9yJy8O3Y";
+
+  const theriyumDB = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+  function escapeHTML(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+
+  async function loadTheriyumSongs() {
+
+    const loadingMessage =
+      document.getElementById("loadingMessage");
+
+    const errorMessage =
+      document.getElementById("errorMessage");
+
+    const results =
+      document.getElementById("results");
+
+    const libraryCount =
+      document.getElementById("libraryCount");
+
+
+    const { data, error } = await theriyumDB
+      .from("songs")
+      .select(`
+        id,
+        title,
+        soundcloud_url,
+        soundcloud_id,
+        artists (
+          name
+        )
+      `)
+      .order("title", { ascending: true });
+
+
+    if (error) {
+
+      console.error(
+        "Theriyum database error:",
+        error
+      );
+
+      loadingMessage.style.display = "none";
+      errorMessage.style.display = "block";
+
+      return;
+    }
+
+
+    loadingMessage.style.display = "none";
+
+    const songs = data || [];
+
+    libraryCount.textContent =
+      songs.length + " tracks in Theriyum";
+
+
+    if (songs.length === 0) {
+
+      results.innerHTML =
+        "<p>No music has been added yet.</p>";
+
+      return;
+    }
+
+
+    results.innerHTML = songs.map(function(song) {
+
+      const title =
+        escapeHTML(song.title || "Untitled Track");
+
+      const artistName =
+        escapeHTML(
+          song.artists?.name ||
+          "Unknown Artist"
+        );
+
+      const soundcloudUrl =
+        song.soundcloud_url || "";
+
+      const searchableText =
+        escapeHTML(
+          (
+            (song.title || "") +
+            " " +
+            (song.artists?.name || "")
+          ).toLowerCase()
+        );
+
+
+      let listenButton = "";
+
+      if (soundcloudUrl) {
+
+        listenButton = `
+          <a
+            class="listen"
+            href="${escapeHTML(soundcloudUrl)}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ▶ Listen
+          </a>
+        `;
+
+      }
+
+
+      return `
+        <article
+          class="song-card"
+          data-search="${searchableText}"
+        >
+
+          <h2>${title}</h2>
+
+          <div class="artist">
+            ${artistName}
+          </div>
+
+          <div class="tags">
+            ${
+              song.soundcloud_id
+                ? '<span class="tag">SoundCloud</span>'
+                : '<span class="tag">Theriyum</span>'
+            }
+          </div>
+
+          <div class="connections">
+            <strong>Theriyum Connections</strong><br>
+            Artist → ${artistName}<br>
+            Related music → coming next
+          </div>
+
+          <div class="actions">
+
+            ${listenButton}
+
+            <a
+              class="buy"
+              href="#"
+              onclick="comingSoon(event)"
+            >
+              Buy Track
+            </a>
+
+          </div>
+
+        </article>
+      `;
+
+    }).join("");
+
+
+    searchMusic();
+  }
+
 
   function searchMusic() {
 
@@ -366,11 +459,16 @@
 
     let matches = 0;
 
+
     cards.forEach(function(card) {
 
       const searchableText =
-        (card.innerText + " " + card.dataset.search)
-          .toLowerCase();
+        (
+          card.innerText +
+          " " +
+          (card.dataset.search || "")
+        ).toLowerCase();
+
 
       if (
         input === "" ||
@@ -388,20 +486,26 @@
 
     });
 
+
     document.getElementById("noResults").style.display =
-      matches === 0 ? "block" : "none";
+      cards.length > 0 && matches === 0
+        ? "block"
+        : "none";
   }
 
 
   document
     .getElementById("searchInput")
-    .addEventListener("keydown", function(event) {
+    .addEventListener(
+      "keydown",
+      function(event) {
 
-      if (event.key === "Enter") {
-        searchMusic();
+        if (event.key === "Enter") {
+          searchMusic();
+        }
+
       }
-
-    });
+    );
 
 
   function comingSoon(event) {
@@ -411,40 +515,10 @@
     alert(
       "Purchasing is coming to Theriyum. This button will eventually connect listeners directly to a legitimate place to buy the track."
     );
-}
-</script>
-  
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-
-  <script>
-  const SUPABASE_URL = "https://jmgimkrmdqrziiumcepg.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_DugDCtB0nTGyjPxJfy2g8Q_9yJy8O3Y";
-
-  const theriyumDB = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-   async function loadTheriyumSongs() {
-  const { data, error } = await theriyumDB
-    .from("songs")
-    .select(`
-      id,
-      title,
-      artists (
-        name
-      )
-    `);
-
-  if (error) {
-    console.error("Theriyum database error:", error);
-    return;
   }
 
-  console.log("THERIYUM SONGS:", data);
-}
 
-loadTheriyumSongs();
+  loadTheriyumSongs();
 </script>
 
 </body>
