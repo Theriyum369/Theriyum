@@ -519,6 +519,30 @@
 
 
   loadTheriyumSongs();
+
+  async function connectSoundCloud() {
+  try {
+    const response = await fetch(
+      "https://jmgimkrmdqrziiumcepg.supabase.co/functions/v1/soundcloud-auth"
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Could not start SoundCloud connection");
+    }
+
+    if (!data.authorization_url) {
+      throw new Error("No authorization URL returned");
+    }
+
+    window.location.href = data.authorization_url;
+  } catch (error) {
+    console.error("SoundCloud connection error:", error);
+    alert("Could not connect to SoundCloud: " + error.message);
+  }
+}
+  
 </script>
 
 </body>
